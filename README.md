@@ -14,6 +14,43 @@ Streamlined build scripts for eMule and its dependencies. All projects are confi
 
 ## Quick Start
 
+### Workflow Diagram
+
+```
+┌─────────────────────────────────────────────────┐
+│  Option 1: One Command (Recommended)            │
+│  ┌────────────────────────────────────┐         │
+│  │  build_complete.cmd                │         │
+│  │  ├─> Setup environment             │         │
+│  │  ├─> Build all libraries           │         │
+│  │  └─> Build eMule                   │         │
+│  └────────────────────────────────────┘         │
+└─────────────────────────────────────────────────┘
+
+┌─────────────────────────────────────────────────┐
+│  Option 2: Step-by-Step                          │
+│  ┌────────────────────────────────────┐         │
+│  │  1. setup_emule.cmd                │         │
+│  │     ├─> Clone repositories         │         │
+│  │     ├─> Create directories         │         │
+│  │     └─> Setup symlinks             │         │
+│  │                                     │         │
+│  │  2. build_all_libs.cmd             │         │
+│  │     ├─> Build cryptopp              │         │
+│  │     ├─> Build CxImage               │         │
+│  │     ├─> Build id3lib                │         │
+│  │     ├─> Build libpng                │         │
+│  │     ├─> Build mbedtls               │         │
+│  │     ├─> Build miniupnp              │         │
+│  │     ├─> Build ResizableLib          │         │
+│  │     └─> Build zlib                  │         │
+│  │                                     │         │
+│  │  3. build_emule.cmd                │         │
+│  │     └─> Build eMule executable     │         │
+│  └────────────────────────────────────┘         │
+└─────────────────────────────────────────────────┘
+```
+
 ### One-Time Setup
 
 ```cmd
@@ -27,6 +64,11 @@ This script will:
 - Prepare the build environment
 
 ### Building
+
+#### Complete Build (Easiest)
+```cmd
+build_complete.cmd    # Setup + Build everything
+```
 
 #### Release Build
 ```cmd
