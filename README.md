@@ -1,41 +1,109 @@
 # Build package for eMule Community
 
-Meant to ease the build work, all projects upgraded to VS 2019, compiling, with correct path references and updated libraries (as much as possible)
+Streamlined build scripts for eMule and its dependencies. All projects are configured for Visual Studio 2019 with correct path references and optimized libraries.
 
-## Pre-requisites
-1. Have a recent `git` installed and available on `PATH`
-2. Ensure the command `mklink` is available on your Windows system, otherwise get `junction` from Sysinternals and modify `002_create_symlinks.cmd` accordingly
-3. Have Visual Studio 2019 Community installed with Windows SDK 10.0 and Toolset v142 (should all be by default when you install C++ components for Visual Studio)
+## Prerequisites
 
-## Build Steps
-This git repo contains accessory scripts to clone the other repos and perform the builds. So clone this repo as first step.
+1. **Git** - Installed and available on `PATH`
+2. **Windows** - `mklink` command available (built-in on Windows Vista+)
+   - Alternative: Use `junction` from Sysinternals and modify `setup_emule.cmd`
+3. **Visual Studio 2019** or later
+   - Windows SDK 10.0
+   - MSVC v142 toolset (x64/x86)
+   - C++ desktop development workload
 
-### 001_clone_git_repos
-First step is to run `001_clone_git_repos.cmd` and then you will have the following directories, which are all the cleaned-up and as much as possible up to date dependencies to build eMule, plus the program directory itself.
+## Quick Start
 
-```
-eMule-cryptopp-8.4.0
-eMule-CxImage-7.02
-eMule-id3lib-3.9.1
-eMule-libpng-1.5.30
-eMule-mbedtls-2.28
-eMule-miniupnp-2.2.3
-eMule-ResizableLib
-eMule-zlib-1.2.12
-eMule
+### One-Time Setup
+
+```cmd
+setup_emule.cmd
 ```
 
-### 002_create_symlinks
-Second step is to run `002_create_symlinks.cmd` just to keep some source code references to include directories unchanged in eMule main project.
+This script will:
+- Clone all required repositories (eMule + dependencies)
+- Create the proper directory structure
+- Set up symbolic links for library includes
+- Prepare the build environment
 
-Then there are scripts each to `launch_VS` if you want to play around with the libraries or the main project, and scripts `build_MSBuild` to launch the builds of each.
+### Building
 
-The directory `libs` is the place where built libraries are copied and referenced by the linker of the main eMule project to build the final executable file.
+#### Release Build
+```cmd
+build_all_libs.cmd    # Build all libraries (Release)
+build_emule.cmd       # Build eMule executable (Release)
+```
 
-The external libraries should require no change at this stage, so they are mostly for reference and all forked from their original repositories for integrity. Minor changes had to be made to build them on Visual Studio 2019, which you can see in git history.
+#### Debug Build
+```cmd
+build_all_libs_debug.cmd    # Build all libraries (Debug)
+build_emule_debug.cmd       # Build eMule executable (Debug)
+```
 
-### 003_build_MSBuild_ALL_libs
-Finally you should be ready to go, this last script `003_build_MSBuild_ALL_libs.cmd` launches all the library builds in parallel. As last step you will have to build eMule `build_MSBuild_eMule.cmd` as of course it depends on all the libraries that you just built.
+## Directory Structure
 
-### Notes
-Please note that I have upgraded few libraries such as libpng, cryptopp, etc.. just taking the most recent minor version from their current git repositories, where applicable. Some others such as ResizableLib or CxImage are not really recent nor maintained. Due to the library upgrades and some other compiler switch changes, please ensure you test properly this build, as I am now doing.
+After running `setup_emule.cmd`, you'll have:
+
+```
+eMule-build/
+├── eMule/                      # Main eMule source
+├── eMule-cryptopp-8.4.0/       # Crypto++ library
+├── eMule-CxImage-7.02/         # Image processing library
+├── eMule-id3lib-3.9.1/         # ID3 tag library
+├── eMule-libpng-1.5.30/        # PNG library
+├── eMule-mbedtls-2.28/         # TLS/SSL library
+├── eMule-miniupnp-2.2.3/       # UPnP library
+├── eMule-ResizableLib/         # UI resize library
+├── eMule-zlib-1.2.12/          # Compression library
+├── eMule-zz-deps-links/        # Symbolic links for includes
+├── libs/                       # Built libraries (Release)
+└── libs_debug/                 # Built libraries (Debug)
+```
+
+## Build Output
+
+- **Release**: `eMule\srchybrid\x64\Release\emule.exe`
+- **Debug**: `eMule\srchybrid\x64\Debug\emule.exe`
+
+## Legacy Scripts
+
+For compatibility, the old numbered scripts are still available:
+- `001_clone_git_repos.cmd` → Use `setup_emule.cmd` instead
+- `002_create_symlinks.cmd` → Integrated into `setup_emule.cmd`
+- `003_build_MSBuild_ALL_libs.cmd` → Use `build_all_libs.cmd` instead
+- `004_build_MSBuild_eMule.cmd` → Use `build_emule.cmd` instead
+
+## Library Versions
+
+Current versions (as of the forked repositories):
+- **cryptopp**: 8.4.0
+- **zlib**: 1.2.12
+- **mbedtls**: 2.28.x
+- **libpng**: 1.5.30
+- **miniupnp**: 2.2.3
+- **CxImage**: 7.02
+- **id3lib**: 3.9.1
+- **ResizableLib**: Latest from fork
+
+> **Note**: These libraries are forks with eMule-specific modifications. The external libraries are maintained separately and require minimal changes to build on Visual Studio 2019.
+
+## Troubleshooting
+
+### Build Errors
+1. Ensure all prerequisites are installed
+2. Run scripts from the repository root directory
+3. Check that Visual Studio 2019 is properly installed with C++ components
+
+### Missing Libraries
+If `build_emule.cmd` fails with missing libraries:
+```cmd
+build_all_libs.cmd
+```
+
+### Clean Build
+To start fresh, delete these directories and re-run setup:
+```cmd
+rmdir /s /q libs libs_debug eMule-zz-deps-links
+rmdir /s /q eMule eMule-*
+setup_emule.cmd
+```
